@@ -2,6 +2,7 @@ import streamlit as st
 import duckdb
 import pandas as pd
 import os
+import altair as alt # Import Altair
 
 # --- Page Setup ---
 st.set_page_config(
@@ -73,32 +74,31 @@ conn = get_connection()
 if conn:
     st.markdown("<h3 class='section-title'>Select an Analysis</h3>", unsafe_allow_html=True)
 
-    # --- Define the analyses ---
+    # --- Define the analyses (LIMIT removed) ---
     analysis_options = {
-        "Top 15 Companies by Job Postings": {
-            # --- THIS QUERY IS CORRECTED ---
+        "Companies by Job Postings": {
             "query": """
                 SELECT c.company_name, COUNT(j.posting_id) AS quantity
                 FROM fact_job_postings AS j
                 JOIN dim_company AS c ON j.company_id = c.company_id
                 GROUP BY c.company_name
                 ORDER BY quantity DESC
-                LIMIT 15
             """,
-            "x_axis": "company_name"
+            "y_axis": "company_name", # Renamed for clarity with Altair
+            "y_title": "Company Name" # Title for the Y-axis
         },
-        "Top 15 Skills in Demand": {
+        "Skills in Demand": {
             "query": """
                 SELECT s.skill_name, COUNT(fjs.posting_id) AS quantity
                 FROM fact_job_posting_skill AS fjs
                 JOIN dim_skills AS s ON fjs.skill_id = s.skill_id
                 GROUP BY s.skill_name
                 ORDER BY quantity DESC
-                LIMIT 15
             """,
-            "x_axis": "skill_name"
+            "y_axis": "skill_name",
+            "y_title": "Skill Name"
         },
-        "Top 15 Job Locations": {
+        "Job Locations": {
             "query": """
                 SELECT l.city || ', ' || l.governorate || ', ' || l.country AS location_full,
                        COUNT(j.posting_id) AS quantity
@@ -107,24 +107,28 @@ if conn:
                 WHERE l.city IS NOT NULL AND l.governorate IS NOT NULL AND l.country IS NOT NULL
                 GROUP BY location_full
                 ORDER BY quantity DESC
-                LIMIT 15
             """,
-             "x_axis": "location_full" # Changed to match the combined location name
+             "y_axis": "location_full",
+             "y_title": "Location"
         }
+        # You can add more analyses here following the same pattern
     }
 
     # --- Create the dropdown ---
     selected_analysis_name = st.selectbox(
         label="Choose a chart to display:",
-        options=analysis_options.keys(),
+        options=list(analysis_options.keys()), # Ensure it's a list for compatibility
         label_visibility="collapsed"
     )
 
     if selected_analysis_name:
-        # Get the query and x-axis details for the selected analysis
+        # Get the query and axis details for the selected analysis
         analysis_details = analysis_options[selected_analysis_name]
         query = analysis_details["query"]
-        x_col = analysis_details["x_axis"]
+        y_col = analysis_details["y_axis"]
+        y_title = analysis_details["y_title"]
+        x_col = "quantity" # Quantity is always the X-axis now
+        x_title = "Number of Job Postings" # Title for X-axis
 
         # Run the query
         data_df = run_query(conn, query)
@@ -133,13 +137,22 @@ if conn:
         if not data_df.empty:
             st.markdown(f"<h3 class='section-title'>{selected_analysis_name}</h3>", unsafe_allow_html=True)
 
-            # Display the bar chart
-            st.bar_chart(data_df.set_index(x_col)['quantity']) # Use set_index for better labels
+            # --- Create Horizontal Bar Chart with Altair ---
+            chart = alt.Chart(data_df).mark_bar().encode(
+                x=alt.X(x_col, title=x_title), # Quantity on X-axis
+                y=alt.Y(y_col, title=y_title, sort='-x'), # Category on Y-axis, sorted by quantity descending
+                tooltip=[y_col, x_col] # Show details on hover
+            ).properties(
+                 # title=selected_analysis_name # Optional: Title within the chart itself
+            ).interactive() # Allow zooming and panning
+
+            st.altair_chart(chart, use_container_width=True)
+            # --- End Altair Chart ---
 
             # Also display the raw data in a table
             st.dataframe(data_df, use_container_width=True)
         else:
-            st.warning("No data found for this analysis.")
+            st.warning("No data found for this analysis or an error occurred running the query.")
 else:
     # This message shows if get_connection() failed
     st.error("Database connection could not be established.")
