@@ -30,4 +30,4 @@ st.markdown("<p style='text-align:center; color:#2C3E50;'>Select a table from th
 # --- Database Connection ---
 @st.cache_resource
 def get_connection():
-    conn = duckdb.connect(database='job_postings.duckdb', read_only=T
+    conn = duckdb.connect(database='job_postings.duckdb', read_only=True)
