@@ -101,6 +101,17 @@ def get_table_names(_conn):
 # --- Connect & Load ---
 conn = get_connection()
 if conn:
+    import os
+    st.write("✅ Database connected successfully!")
+    st.write("📂 Current directory:", os.getcwd())
+    db_path = os.path.join(os.path.dirname(__file__), "..", "job_postings.duckdb")
+    st.write("🔍 Database path:", db_path)
+    st.write("📁 File exists:", os.path.exists(db_path))
+
+    table_names = get_table_names(conn)
+    st.write("🧾 Tables found:", table_names)
+
+if conn:
     table_names = get_table_names(conn)
 
     TABLE_DISPLAY_NAMES = {
