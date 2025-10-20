@@ -44,34 +44,40 @@ st.markdown("""
     
     /* This targets the main box you see *before* clicking */
     div[data-baseweb="select"] > div {
-        background-color: #F9F9F9 !important;    /* Off-white background */
-        color: #000000 !important;              /* Black text */
+        background-color: #F9F9F9 !important;
+        color: #000000 !important;
         font-weight: 500 !important;
         border-radius: 6px !important;
-        border: 1px solid #D1D5DB !important;  /* Added a light border */
+        border: 1px solid #D1D5DB !important;
     }
 
     /* This targets the text *inside* the main box */
     div[data-baseweb="select"] span {
-        color: #000000 !important;              /* Black text */
+        color: #000000 !important;
     }
 
     /* This targets the dropdown arrow icon */
     div[data-baseweb="select"] svg {
-        fill: #000000 !important;              /* Black arrow */
+        fill: #000000 !important;
     }
 
-    /* --- This is the CORRECTED part --- */
+    /* --- THIS IS THE FINAL CORRECTED CSS --- */
     
-    /* This targets the items in the *expanded list* */
-    div[data-baseweb="popover"] li[role="option"] {
+    /* Target list items specifically in dark mode */
+    [data-theme="dark"] div[data-baseweb="popover"] li[role="option"] {
         background-color: #F9F9F9 !important;    /* Off-white background */
         color: #000000 !important;              /* Black text */
     }
 
-    /* This targets the *hovered* items in the list */
-    div[data-baseweb="popover"] li[role="option"]:hover {
+    /* Target hovered list items specifically in dark mode */
+    [data-theme="dark"] div[data-baseweb="popover"] li[role="option"]:hover {
         background-color: #EDEDED !important;    /* Slightly darker off-white */
+        color: #000000 !important;
+    }
+    
+    /* Target the SELECTED item *in the list* (which turns blue) */
+    [data-theme="dark"] div[data-baseweb="popover"] li[aria-selected="true"] {
+        background-color: #D1D5DB !important;    /* A medium grey for selected */
         color: #000000 !important;
     }
 
@@ -129,7 +135,6 @@ if conn:
         "dim_date": "Date Information"
     }
 
-    # --- THIS IS THE MODIFIED SECTION ---
     # Define the actual table names you want to hide
     tables_to_hide = [
         "fact_job_posting_skill", 
@@ -139,7 +144,6 @@ if conn:
 
     # Filter the list of tables to create the options
     options_to_show = [name for name in table_names if name not in tables_to_hide]
-    # --- END OF MODIFIED SECTION ---
 
     if options_to_show:
         st.markdown("<h3 class='section-title'>📂 Select a Table</h3>", unsafe_allow_html=True)
@@ -153,7 +157,7 @@ if conn:
         )
 
         if selected_table:
-            st.markdown(f"<h3 class='section-title'>Displaying Data for: {TABLE_DISPLAY_NAMES.get(selected_table, selected_table.replace('_', ' ').title())}</h3>", unsafe_allow_html=True)
+            st.markdown(f"<h3 class='section-title'>Displaying Data for: {TABLE_DY_NAMES.get(selected_table, selected_table.replace('_', ' ').title())}</h3>", unsafe_allow_html=True)
 
             # Get all column names
             all_columns = conn.execute(f"PRAGMA table_info('{selected_table}')").fetchdf()
