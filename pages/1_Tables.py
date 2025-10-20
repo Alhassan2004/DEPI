@@ -11,111 +11,27 @@ st.set_page_config(
 )
 
 # --- Custom Styling ---
+# We have removed all background/color CSS.
+# This lets Streamlit's default dark theme work correctly.
+# We only keep the styles for the titles.
 st.markdown("""
     <style>
-    
-    /* 1. Overall Page Style */
-    /* Force the main app background to be off-white */
-    .stApp {
-        background-color: #F9F9F9 !important; 
-        color: #000000 !important;         
-    }
-
-    /* 2. Titles (Kept from your original request) */
+    /* Titles */
     h1, h2, h3 {
         text-align: center;
-        color: #1E3A8A; 
+        color: #1E3A8A; /* Blue title color */
         font-family: 'Arial', sans-serif;
     }
+
+    /* Section title */
     .section-title {
         text-align: center;
         font-size: 22px;
-        color: #2563EB;
+        color: #2563EB; /* Lighter blue for section titles */
         margin-top: 30px;
         margin-bottom: 10px;
         font-weight: bold;
     }
-    
-    /* 3. General Text (Ensures it's black) */
-    p, div, label, span {
-        color: #000000 !important;
-    }
-
-    /* 4. DROPDOWN (Selectbox) STYLING */
-    
-    /* The main box *before* clicking */
-    div[data-baseweb="select"] > div {
-        background-color: #F9F9F9 !important;    /* Off-white */
-        color: #000000 !important;              /* Black text */
-        border: 1px solid #D1D5DB !important;  /* Light grey border */
-    }
-
-    /* The text *inside* the main box */
-    div[data-baseweb="select"] span {
-        color: #000000 !important;
-    }
-
-    /* The dropdown arrow */
-    div[data-baseweb="select"] svg {
-        fill: #000000 !important;
-    }
-
-    /* 5. DROPDOWN *LIST* STYLING (The popover) */
-    
-    /* This targets items in the expanded list (for Light and Dark themes) */
-    [data-theme="light"] div[data-baseweb="popover"] li[role="option"],
-    [data-theme="dark"] div[data-baseweb="popover"] li[role="option"] {
-        background-color: #F9F9F9 !important;    /* Off-white */
-        color: #000000 !important;              /* Black text */
-    }
-
-    /* The *hovered* item in the list */
-    [data-theme="light"] div[data-baseweb="popover"] li[role="option"]:hover,
-    [data-theme="dark"] div[data-baseweb="popover"] li[role="option"]:hover {
-        background-color: #EDEDED !important;    /* Slightly darker off-white */
-        color: #000000 !important;
-    }
-    
-    /* The *selected* item in the list */
-    [data-theme="dark"] div[data-baseweb="popover"] li[aria-selected="true"] {
-        background-color: #D1D5DB !important;    /* Medium grey for selected */
-        color: #000000 !important;
-    }
-
-    /* * 6. DATAFRAME (Table) STYLING - *** THIS IS THE NEW FIX ***
-     */
-    
-    /* Main container of the dataframe */
-    [data-testid="stDataFrame"] {
-        background-color: #F9F9F9 !important; /* Off-white container */
-        border: 1px solid #D1D5DB !important;
-        border-radius: 8px !important;
-    }
-    
-    /* Header row */
-    [data-testid="stHeader"] {
-        background-color: #EDEDED !important; /* Light grey header */
-        color: #000000 !important;
-    }
-    
-    /* Ensure all text inside the dataframe (header + cells) is black */
-    [data-testid="stDataFrame"] div,
-    [data-testid="stHeader"] div {
-         color: #000000 !important;
-    }
-    
-    /* Set background for the data cells area */
-    [data-testid="stTable"] {
-        background-color: #F9F9F9 !important; /* Off-white rows */
-        color: #000000 !important;
-    }
-
-    /* Force individual cells (just in case) */
-    [data-testid="stTable"] [data-testid="stElement"] {
-        background-color: #F9F9F9 !important;
-        color: #000000 !important;
-    }
-    
     </style>
 """, unsafe_allow_html=True)
 
