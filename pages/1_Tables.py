@@ -40,21 +40,35 @@ st.markdown("""
         background-color: #F9FAFB;
     }
 
-    /* Dropdown styling (selectbox) */
+    /* --- DROPDOWN (Selectbox) COLORS --- */
+    /* The main dropdown box (before clicking) */
     div[data-baseweb="select"] > div {
-        background-color: #F0F4FF !important;
-        color: #1E3A8A !important;
-        font-weight: 600 !important;
+        background-color: #F9F9F9 !important;   /* Off-white background */
+        color: #000000 !important;              /* Black text */
+        font-weight: 500 !important;
+        border-radius: 6px !important;
     }
+
+    /* The text color inside the dropdown (all items + selected) */
     div[data-baseweb="select"] span {
-        color: #1E3A8A !important;
+        color: #000000 !important;              /* Black text */
     }
+
+    /* The dropdown arrow icon */
     div[data-baseweb="select"] svg {
-        fill: #1E3A8A !important;
+        fill: #000000 !important;               /* Black arrow */
     }
+
+    /* Items in the expanded dropdown list */
+    div[data-baseweb="select"] div {
+        background-color: #F9F9F9 !important;   /* Off-white background */
+        color: #000000 !important;              /* Black text */
+    }
+
+    /* Hovered items (slightly darker for feedback) */
     div[data-baseweb="select"] div:hover {
-        background-color: #DBEAFE !important;
-        color: #1E3A8A !important;
+        background-color: #EDEDED !important;   /* Slightly darker off-white */
+        color: #000000 !important;
     }
 
     /* Section title */
