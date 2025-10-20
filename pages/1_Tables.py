@@ -41,33 +41,37 @@ st.markdown("""
     }
 
     /* --- DROPDOWN (Selectbox) COLORS --- */
-    /* The main dropdown box (before clicking) */
+    
+    /* This targets the main box you see *before* clicking */
     div[data-baseweb="select"] > div {
-        background-color: #F9F9F9 !important;   /* Off-white background */
+        background-color: #F9F9F9 !important;    /* Off-white background */
         color: #000000 !important;              /* Black text */
         font-weight: 500 !important;
         border-radius: 6px !important;
+        border: 1px solid #D1D5DB !important;  /* Added a light border */
     }
 
-    /* The text color inside the dropdown (all items + selected) */
+    /* This targets the text *inside* the main box */
     div[data-baseweb="select"] span {
         color: #000000 !important;              /* Black text */
     }
 
-    /* The dropdown arrow icon */
+    /* This targets the dropdown arrow icon */
     div[data-baseweb="select"] svg {
-        fill: #000000 !important;               /* Black arrow */
+        fill: #000000 !important;              /* Black arrow */
     }
 
-    /* Items in the expanded dropdown list */
-    div[data-baseweb="select"] div {
-        background-color: #F9F9F9 !important;   /* Off-white background */
+    /* --- This is the CORRECTED part --- */
+    
+    /* This targets the items in the *expanded list* */
+    div[data-baseweb="popover"] li[role="option"] {
+        background-color: #F9F9F9 !important;    /* Off-white background */
         color: #000000 !important;              /* Black text */
     }
 
-    /* Hovered items (slightly darker for feedback) */
-    div[data-baseweb="select"] div:hover {
-        background-color: #EDEDED !important;   /* Slightly darker off-white */
+    /* This targets the *hovered* items in the list */
+    div[data-baseweb="popover"] li[role="option"]:hover {
+        background-color: #EDEDED !important;    /* Slightly darker off-white */
         color: #000000 !important;
     }
 
@@ -160,4 +164,3 @@ if conn:
         st.warning("⚠️ No tables found in the database. Please verify your 'job_postings.duckdb' file.")
 else:
     st.stop()
-
