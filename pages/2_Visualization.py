@@ -2,30 +2,25 @@ import streamlit as st
 import duckdb
 import pandas as pd
 import os
-import altair as alt # Import Altair
 
-# --- Page Setup ---
 st.set_page_config(
-    page_title="Data Visualizations",
+    page_title="Job Postings Explorer",
     layout="wide",
-    page_icon="📊"
+    page_icon="📋"
 )
 
-# --- Custom Styling (Same as your other pages) ---
 st.markdown("""
     <style>
-    /* Titles */
     h1, h2, h3 {
         text-align: center;
-        color: #1E3A8A; /* Blue title color */
+        color: #1E3A8A;
         font-family: 'Arial', sans-serif;
     }
 
-    /* Section title */
     .section-title {
         text-align: center;
         font-size: 22px;
-        color: #2563EB; /* Lighter blue for section titles */
+        color: #2563EB;
         margin-top: 30px;
         margin-bottom: 10px;
         font-weight: bold;
@@ -33,12 +28,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Header ---
-st.markdown("<h1>Data Visualizations</h1>", unsafe_allow_html=True)
-# --- The line below has been removed ---
-# st.markdown("<p style='text-align:center;'>Select a category to visualize the count of job postings.</p>", unsafe_allow_html=True)
+st.markdown("<h1>📋 Job Postings Database Explorer</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;'>Select a table from the database to view its contents.</p>", unsafe_allow_html=True)
 
-# --- Database Connection (Same as your table viewer page) ---
 @st.cache_resource
 def get_connection():
     db_path = "job_postings.duckdb"
@@ -59,102 +51,66 @@ def get_connection():
         st.error(f"Error connecting to database: {e}")
         return None
 
-# --- Data Query Function ---
 @st.cache_data
-def run_query(_conn, query):
-    """ Runs a SQL query and returns a DataFrame. """
+def get_table_names(_conn):
     try:
-        data_df = _conn.execute(query).fetchdf()
-        return data_df
+        tables = _conn.execute("SHOW ALL TABLES;").fetchdf()
+        return tables['name'].tolist()
     except Exception as e:
-        st.error(f"Error running query: {e}")
-        return pd.DataFrame()
+        st.error(f"Error fetching tables: {e}")
+        return []
 
-# --- Main App Logic ---
 conn = get_connection()
 if conn:
-    st.markdown("<h3 class='section-title'>Select an Analysis</h3>", unsafe_allow_html=True)
+    all_table_names = get_table_names(conn)
 
-    # --- Define the analyses (Axes definitions updated) ---
-    analysis_options = {
-        "Companies by Job Postings": {
-            "query": """
-                SELECT c.company_name, COUNT(j.posting_id) AS quantity
-                FROM fact_job_postings AS j
-                JOIN dim_company AS c ON j.company_id = c.company_id
-                GROUP BY c.company_name
-                ORDER BY quantity DESC
-            """,
-            "x_axis": "company_name", # Category on X-axis
-            "x_title": "Company Name"  # Title for the X-axis
-        },
-        "Skills in Demand": {
-            "query": """
-                SELECT s.skill_name, COUNT(fjs.posting_id) AS quantity
-                FROM fact_job_posting_skill AS fjs
-                JOIN dim_skills AS s ON fjs.skill_id = s.skill_id
-                GROUP BY s.skill_name
-                ORDER BY quantity DESC
-            """,
-            "x_axis": "skill_name",
-            "x_title": "Skill Name"
-        },
-        "Job Locations": {
-            "query": """
-                SELECT l.city || ', ' || l.governorate || ', ' || l.country AS location_full,
-                       COUNT(j.posting_id) AS quantity
-                FROM fact_job_postings AS j
-                JOIN dim_location AS l ON j.location_id = l.location_id
-                WHERE l.city IS NOT NULL AND l.governorate IS NOT NULL AND l.country IS NOT NULL
-                GROUP BY location_full
-                ORDER BY quantity DESC
-            """,
-             "x_axis": "location_full",
-             "x_title": "Location"
-        }
-        # You can add more analyses here following the same pattern
+    TABLE_DISPLAY_NAMES = {
+        "fact_job_postings": "All Job Postings",
+        "dim_skills": "Skills Information",
+        "dim_company": "Company Information",
+        "dim_location": "Location Information",
+        "dim_date": "Date Information"
     }
 
-    # --- Create the dropdown ---
-    selected_analysis_name = st.selectbox(
-        label="Choose a chart to display:",
-        options=list(analysis_options.keys()), # Ensure it's a list for compatibility
-        label_visibility="collapsed"
-    )
+    tables_to_hide = [
+        "fact_job_posting_skill",
+        "raw_job_postings",
+        "stg_job_postings"
+    ]
 
-    if selected_analysis_name:
-        # Get the query and axis details for the selected analysis
-        analysis_details = analysis_options[selected_analysis_name]
-        query = analysis_details["query"]
-        x_col = analysis_details["x_axis"] # Category column
-        x_title = analysis_details["x_title"] # Category axis title
-        y_col = "quantity" # Quantity is always the Y-axis now
-        y_title = "Number of Job Postings" # Quantity axis title
+    options_to_show = [name for name in all_table_names if name not in tables_to_hide]
 
-        # Run the query
-        data_df = run_query(conn, query)
+    if options_to_show:
+        st.markdown("<h3 class='section-title'>📂 Select a Table</h3>", unsafe_allow_html=True)
 
-        # --- Display the chart and data ---
-        if not data_df.empty:
-            st.markdown(f"<h3 class='section-title'>{selected_analysis_name}</h3>", unsafe_allow_html=True)
+        selected_table = st.selectbox(
+            label="Select a table",
+            options=options_to_show,
+            format_func=lambda name: TABLE_DISPLAY_NAMES.get(name, name.replace("_", " ").title()),
+            label_visibility="collapsed"
+        )
 
-            # --- Create Vertical Bar Chart with Altair ---
-            chart = alt.Chart(data_df).mark_bar().encode(
-                x=alt.X(x_col, title=x_title, sort='-y'), # Category on X-axis, sorted by quantity descending
-                y=alt.Y(y_col, title=y_title), # Quantity on Y-axis
-                tooltip=[x_col, y_col] # Show details on hover
-            ).properties(
-                 # title=selected_analysis_name # Optional: Title within the chart itself
-            ).interactive() # Allow zooming and panning
+        if selected_table:
+            display_name = TABLE_DISPLAY_NAMES.get(selected_table, selected_table.replace('_', ' ').title())
+            st.markdown(f"<h3 class='section-title'>Displaying Data for: {display_name}</h3>", unsafe_allow_html=True)
 
-            st.altair_chart(chart, use_container_width=True)
-            # --- End Altair Chart ---
+            try:
+                all_columns = conn.execute(f"PRAGMA table_info('{selected_table}')").fetchdf()
+                column_names = all_columns['name'].tolist()
 
-            # Also display the raw data in a table
-            st.dataframe(data_df, use_container_width=True)
-        else:
-            st.warning("No data found for this analysis or an error occurred running the query.")
+                columns_to_show = [name for name in column_names if not name.endswith('_id')]
+                columns_string = ", ".join(f'"{name}"' for name in columns_to_show)
+
+                query = f"SELECT {columns_string} FROM {selected_table} LIMIT 1000"
+
+                data_df = conn.execute(query).fetchdf()
+                st.dataframe(data_df, use_container_width=True)
+
+            except Exception as e:
+                st.error(f"Error loading table '{selected_table}': {e}")
+
+    else:
+        st.warning("⚠️ No tables found to display. Please verify your 'job_postings.duckdb' file.")
 else:
-    # This message shows if get_connection() failed
     st.error("Database connection could not be established.")
     st.stop()
