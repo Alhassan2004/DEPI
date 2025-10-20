@@ -63,4 +63,5 @@ if selected_table:
     query = f"SELECT {columns_string} FROM {selected_table}"
     
     data_df = conn.execute(query).fetchdf()
-    st.dataframe(data_df, use_container_width=True)
+
+    st.dataframe(data_df, use_container_width=Tru
