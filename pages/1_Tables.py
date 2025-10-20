@@ -13,75 +13,18 @@ st.set_page_config(
 # --- Custom Styling ---
 st.markdown("""
     <style>
-    /* Background and font */
+    /* 1. Overall Page Style */
     .stApp {
-        background-color: #FFFFFF;
-        color: #1A1A1A;
-        font-family: 'Arial', sans-serif;
+        background-color: #F9F9F9; /* Off-white background */
+        color: #000000;         /* Default black text */
     }
 
-    /* Titles */
+    /* 2. Titles (Kept from your original request) */
     h1, h2, h3 {
         text-align: center;
-        color: #1E3A8A;
+        color: #1E3A8A; /* Blue title color */
         font-family: 'Arial', sans-serif;
     }
-
-    /* Paragraphs and labels */
-    p, div, label {
-        color: #1A1A1A !important;
-        font-family: 'Arial', sans-serif;
-    }
-
-    /* DataFrame container */
-    .stDataFrame {
-        border: 1px solid #E5E7EB;
-        border-radius: 10px;
-        background-color: #F9FAFB;
-    }
-
-    /* --- DROPDOWN (Selectbox) COLORS --- */
-    
-    /* This targets the main box you see *before* clicking */
-    div[data-baseweb="select"] > div {
-        background-color: #F9F9F9 !important;
-        color: #000000 !important;
-        font-weight: 500 !important;
-        border-radius: 6px !important;
-        border: 1px solid #D1D5DB !important;
-    }
-
-    /* This targets the text *inside* the main box */
-    div[data-baseweb="select"] span {
-        color: #000000 !important;
-    }
-
-    /* This targets the dropdown arrow icon */
-    div[data-baseweb="select"] svg {
-        fill: #000000 !important;
-    }
-
-    /* --- THIS IS THE FINAL CORRECTED CSS --- */
-    
-    /* Target list items specifically in dark mode */
-    [data-theme="dark"] div[data-baseweb="popover"] li[role="option"] {
-        background-color: #F9F9F9 !important;    /* Off-white background */
-        color: #000000 !important;              /* Black text */
-    }
-
-    /* Target hovered list items specifically in dark mode */
-    [data-theme="dark"] div[data-baseweb="popover"] li[role="option"]:hover {
-        background-color: #EDEDED !important;    /* Slightly darker off-white */
-        color: #000000 !important;
-    }
-    
-    /* Target the SELECTED item *in the list* (which turns blue) */
-    [data-theme="dark"] div[data-baseweb="popover"] li[aria-selected="true"] {
-        background-color: #D1D5DB !important;    /* A medium grey for selected */
-        color: #000000 !important;
-    }
-
-    /* Section title */
     .section-title {
         text-align: center;
         font-size: 22px;
@@ -90,6 +33,69 @@ st.markdown("""
         margin-bottom: 10px;
         font-weight: bold;
     }
+    
+    /* 3. General Text (Ensures it's black) */
+    p, div, label, span {
+        color: #000000 !important;
+    }
+
+    /* 4. DROPDOWN (Selectbox) STYLING */
+    
+    /* The main box *before* clicking */
+    div[data-baseweb="select"] > div {
+        background-color: #F9F9F9 !important;    /* Off-white */
+        color: #000000 !important;              /* Black text */
+        border: 1px solid #D1D5DB !important;  /* Light grey border */
+    }
+
+    /* The text *inside* the main box */
+    div[data-baseweb="select"] span {
+        color: #000000 !important;
+    }
+
+    /* The dropdown arrow */
+    div[data-baseweb="select"] svg {
+        fill: #000000 !important;
+    }
+
+    /* 5. DROPDOWN *LIST* STYLING (The popover) */
+    
+    /* This targets items in the expanded list (for Light and Dark themes) */
+    [data-theme="light"] div[data-baseweb="popover"] li[role="option"],
+    [data-theme="dark"] div[data-baseweb="popover"] li[role="option"] {
+        background-color: #F9F9F9 !important;    /* Off-white */
+        color: #000000 !important;              /* Black text */
+    }
+
+    /* The *hovered* item in the list */
+    [data-theme="light"] div[data-baseweb="popover"] li[role="option"]:hover,
+    [data-theme="dark"] div[data-baseweb="popover"] li[role="option"]:hover {
+        background-color: #EDEDED !important;    /* Slightly darker off-white */
+        color: #000000 !important;
+    }
+    
+    /* The *selected* item in the list */
+    [data-theme="dark"] div[data-baseweb="popover"] li[aria-selected="true"] {
+        background-color: #D1D5DB !important;    /* Medium grey for selected */
+        color: #000000 !important;
+    }
+
+    /* 6. DATAFRAME (Table) STYLING */
+    .stDataFrame {
+        background-color: #F9F9F9; /* Off-white container */
+        border: 1px solid #D1D5DB;
+        border-radius: 8px;
+    }
+    /* Ensure dataframe text is black */
+    .stDataFrame div {
+         color: #000000 !important;
+    }
+    /* Dataframe header */
+    [data-testid="stHeader"] {
+        background-color: #EDEDED; /* Light grey header */
+        color: #000000;
+    }
+    
     </style>
 """, unsafe_allow_html=True)
 
@@ -100,13 +106,25 @@ st.markdown("<p style='text-align:center;'>Select a table from the database to v
 # --- Database Connection ---
 @st.cache_resource
 def get_connection():
-    # Get absolute path (works both locally and on Streamlit Cloud)
-    db_path = os.path.join(os.path.dirname(__file__), "..", "job_postings.duckdb")
-    if not os.path.exists(db_path):
-        st.error("❌ Database file not found. Make sure 'job_postings.duckdb' exists in the main project folder.")
+    # Use a relative path to find the database
+    # Assumes db is in the parent folder (e.g., main repo folder)
+    # and this script is in a subfolder (e.g., /pages)
+    # If a.py and db are in the SAME folder, just use "job_postings.duckdb"
+    db_path = "job_postings.duckdb" 
+    
+    # This logic tries to find it in the parent folder, good for Streamlit Cloud
+    alt_db_path = os.path.join(os.path.dirname(__file__), "..", "job_postings.duckdb")
+    
+    if os.path.exists(db_path):
+        db_to_use = db_path
+    elif os.path.exists(alt_db_path):
+        db_to_use = alt_db_path
+    else:
+        st.error(f"❌ Database file not found. Tried: '{db_path}' and '{alt_db_path}'")
         return None
+        
     try:
-        conn = duckdb.connect(database=db_path, read_only=True)
+        conn = duckdb.connect(database=db_to_use, read_only=True)
         return conn
     except Exception as e:
         st.error(f"Error connecting to database: {e}")
@@ -121,12 +139,14 @@ def get_table_names(_conn):
         st.error(f"Error fetching tables: {e}")
         return []
 
-# --- Connect and Load ---
+# --- Main App Logic ---
 conn = get_connection()
 if conn:
-    table_names = get_table_names(conn)
+    all_table_names = get_table_names(conn)
 
-    # Known display names
+    # --- Configuration for Table Names ---
+    
+    # 1. Pretty names for known tables
     TABLE_DISPLAY_NAMES = {
         "fact_job_postings": "All Job Postings",
         "dim_skills": "Skills Information",
@@ -135,45 +155,55 @@ if conn:
         "dim_date": "Date Information"
     }
 
-    # Define the actual table names you want to hide
+    # 2. Tables to HIDE from the dropdown
     tables_to_hide = [
         "fact_job_posting_skill", 
         "raw_job_postings", 
         "stg_job_postings"
     ]
-
-    # Filter the list of tables to create the options
-    options_to_show = [name for name in table_names if name not in tables_to_hide]
+    
+    # 3. Create the final list of options
+    options_to_show = [name for name in all_table_names if name not in tables_to_hide]
+    # --- End Configuration ---
 
     if options_to_show:
         st.markdown("<h3 class='section-title'>📂 Select a Table</h3>", unsafe_allow_html=True)
 
+        # Create the dropdown menu
         selected_table = st.selectbox(
-            "",
-            options=options_to_show, # This now uses the filtered list
-            # Show pretty names for known tables, readable names for others
+            label="Select a table", # Label is needed but hidden
+            options=options_to_show,
             format_func=lambda name: TABLE_DISPLAY_NAMES.get(name, name.replace("_", " ").title()),
             label_visibility="collapsed"
         )
 
+        # --- Display the Selected Table ---
         if selected_table:
-            st.markdown(f"<h3 class='section-title'>Displaying Data for: {TABLE_DY_NAMES.get(selected_table, selected_table.replace('_', ' ').title())}</h3>", unsafe_allow_html=True)
+            display_name = TABLE_DISPLAY_NAMES.get(selected_table, selected_table.replace('_', ' ').title())
+            st.markdown(f"<h3 class='section-title'>Displaying Data for: {display_name}</h3>", unsafe_allow_html=True)
 
-            # Get all column names
-            all_columns = conn.execute(f"PRAGMA table_info('{selected_table}')").fetchdf()
-            column_names = all_columns['name'].tolist()
+            try:
+                # Get all column names for the selected table
+                all_columns = conn.execute(f"PRAGMA table_info('{selected_table}')").fetchdf()
+                column_names = all_columns['name'].tolist()
 
-            # Filter out *_id columns
-            columns_to_show = [name for name in column_names if not name.endswith('_id')]
+                # Filter out any columns that end in '_id'
+                columns_to_show = [name for name in column_names if not name.endswith('_id')]
+                columns_string = ", ".join(f'"{name}"' for name in columns_to_show) # Add quotes for safety
 
-            # Build query
-            columns_string = ", ".join(columns_to_show)
-            query = f"SELECT {columns_string} FROM {selected_table}"
+                # Build the query
+                query = f"SELECT {columns_string} FROM {selected_table} LIMIT 1000" # Limit to 1000 rows for performance
 
-            # Fetch and display data
-            data_df = conn.execute(query).fetchdf()
-            st.dataframe(data_df, use_container_width=True)
+                # Fetch and display data
+                data_df = conn.execute(query).fetchdf()
+                st.dataframe(data_df, use_container_width=True)
+            
+            except Exception as e:
+                st.error(f"Error loading table '{selected_table}': {e}")
+
     else:
-        st.warning("⚠️ No tables found in the database. Please verify your 'job_postings.duckdb' file.")
+        st.warning("⚠️ No tables found to display. Please verify your 'job_postings.duckdb' file.")
 else:
+    # This message shows if get_connection() failed
+    st.error("Database connection could not be established.")
     st.stop()
