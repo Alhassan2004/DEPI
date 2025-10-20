@@ -18,7 +18,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Page Title ---
-st.markdown("<h1>💼 Intelligent Career Advisor Dashboard</h1>", unsafe_allow_html=True)
+st.markdown("<h1>Intelligent Career Advisor Dashboard</h1>", unsafe_allow_html=True)
 
 # --- Main Description Section ---
 # Removed the inline "color:#2C3E50;" style to let the dark theme apply
@@ -41,3 +41,4 @@ st.markdown("""
         (Mohammed Morsi - Alhassan Soliman - Yassin Harraz - Maha Khaled - Youstina Nader - Menna El Naiad)
     </div>
 """, unsafe_allow_html=True)
+
