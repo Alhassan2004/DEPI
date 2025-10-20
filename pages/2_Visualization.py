@@ -35,7 +35,8 @@ st.markdown("""
 
 # --- Header ---
 st.markdown("<h1>📊 Data Visualizations</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>Select a category to visualize the count of job postings.</p>", unsafe_allow_html=True)
+# --- The line below has been removed ---
+# st.markdown("<p style='text-align:center;'>Select a category to visualize the count of job postings.</p>", unsafe_allow_html=True)
 
 # --- Database Connection (Same as your table viewer page) ---
 @st.cache_resource
@@ -74,7 +75,7 @@ conn = get_connection()
 if conn:
     st.markdown("<h3 class='section-title'>Select an Analysis</h3>", unsafe_allow_html=True)
 
-    # --- Define the analyses (LIMIT removed) ---
+    # --- Define the analyses (Axes definitions updated) ---
     analysis_options = {
         "Companies by Job Postings": {
             "query": """
@@ -84,8 +85,8 @@ if conn:
                 GROUP BY c.company_name
                 ORDER BY quantity DESC
             """,
-            "y_axis": "company_name", # Renamed for clarity with Altair
-            "y_title": "Company Name" # Title for the Y-axis
+            "x_axis": "company_name", # Category on X-axis
+            "x_title": "Company Name"  # Title for the X-axis
         },
         "Skills in Demand": {
             "query": """
@@ -95,8 +96,8 @@ if conn:
                 GROUP BY s.skill_name
                 ORDER BY quantity DESC
             """,
-            "y_axis": "skill_name",
-            "y_title": "Skill Name"
+            "x_axis": "skill_name",
+            "x_title": "Skill Name"
         },
         "Job Locations": {
             "query": """
@@ -108,8 +109,8 @@ if conn:
                 GROUP BY location_full
                 ORDER BY quantity DESC
             """,
-             "y_axis": "location_full",
-             "y_title": "Location"
+             "x_axis": "location_full",
+             "x_title": "Location"
         }
         # You can add more analyses here following the same pattern
     }
@@ -125,10 +126,10 @@ if conn:
         # Get the query and axis details for the selected analysis
         analysis_details = analysis_options[selected_analysis_name]
         query = analysis_details["query"]
-        y_col = analysis_details["y_axis"]
-        y_title = analysis_details["y_title"]
-        x_col = "quantity" # Quantity is always the X-axis now
-        x_title = "Number of Job Postings" # Title for X-axis
+        x_col = analysis_details["x_axis"] # Category column
+        x_title = analysis_details["x_title"] # Category axis title
+        y_col = "quantity" # Quantity is always the Y-axis now
+        y_title = "Number of Job Postings" # Quantity axis title
 
         # Run the query
         data_df = run_query(conn, query)
@@ -137,11 +138,11 @@ if conn:
         if not data_df.empty:
             st.markdown(f"<h3 class='section-title'>{selected_analysis_name}</h3>", unsafe_allow_html=True)
 
-            # --- Create Horizontal Bar Chart with Altair ---
+            # --- Create Vertical Bar Chart with Altair ---
             chart = alt.Chart(data_df).mark_bar().encode(
-                x=alt.X(x_col, title=x_title), # Quantity on X-axis
-                y=alt.Y(y_col, title=y_title, sort='-x'), # Category on Y-axis, sorted by quantity descending
-                tooltip=[y_col, x_col] # Show details on hover
+                x=alt.X(x_col, title=x_title, sort='-y'), # Category on X-axis, sorted by quantity descending
+                y=alt.Y(y_col, title=y_title), # Quantity on Y-axis
+                tooltip=[x_col, y_col] # Show details on hover
             ).properties(
                  # title=selected_analysis_name # Optional: Title within the chart itself
             ).interactive() # Allow zooming and panning
