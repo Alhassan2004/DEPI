@@ -39,9 +39,9 @@ st.markdown("<p style='text-align:center;'>Select a category to visualize the co
 # --- Database Connection (Same as your table viewer page) ---
 @st.cache_resource
 def get_connection():
-    db_path = "job_postings.duckdb" 
+    db_path = "job_postings.duckdb"
     alt_db_path = os.path.join(os.path.dirname(__file__), "..", "job_postings.duckdb")
-    
+
     if os.path.exists(db_path):
         db_to_use = db_path
     elif os.path.exists(alt_db_path):
@@ -49,7 +49,7 @@ def get_connection():
     else:
         st.error(f"❌ Database file not found. Tried: '{db_path}' and '{alt_db_path}'")
         return None
-        
+
     try:
         conn = duckdb.connect(database=db_to_use, read_only=True)
         return conn
@@ -74,11 +74,11 @@ if conn:
     st.markdown("<h3 class='section-title'>Select an Analysis</h3>", unsafe_allow_html=True)
 
     # --- Define the analyses ---
-    # The user chooses one of these, and we run the corresponding query
     analysis_options = {
         "Top 15 Companies by Job Postings": {
+            # --- THIS QUERY IS CORRECTED ---
             "query": """
-                SELECT c.company_name, COUNT(j.job_id) AS quantity
+                SELECT c.company_name, COUNT(j.posting_id) AS quantity
                 FROM fact_job_postings AS j
                 JOIN dim_company AS c ON j.company_id = c.company_id
                 GROUP BY c.company_name
@@ -89,7 +89,7 @@ if conn:
         },
         "Top 15 Skills in Demand": {
             "query": """
-                SELECT s.skill_name, COUNT(fjs.job_id) AS quantity
+                SELECT s.skill_name, COUNT(fjs.posting_id) AS quantity
                 FROM fact_job_posting_skill AS fjs
                 JOIN dim_skills AS s ON fjs.skill_id = s.skill_id
                 GROUP BY s.skill_name
@@ -100,14 +100,16 @@ if conn:
         },
         "Top 15 Job Locations": {
             "query": """
-                SELECT l.location, COUNT(j.job_id) AS quantity
+                SELECT l.city || ', ' || l.governorate || ', ' || l.country AS location_full,
+                       COUNT(j.posting_id) AS quantity
                 FROM fact_job_postings AS j
                 JOIN dim_location AS l ON j.location_id = l.location_id
-                GROUP BY l.location
+                WHERE l.city IS NOT NULL AND l.governorate IS NOT NULL AND l.country IS NOT NULL
+                GROUP BY location_full
                 ORDER BY quantity DESC
                 LIMIT 15
             """,
-            "x_axis": "location"
+             "x_axis": "location_full" # Changed to match the combined location name
         }
     }
 
@@ -123,19 +125,17 @@ if conn:
         analysis_details = analysis_options[selected_analysis_name]
         query = analysis_details["query"]
         x_col = analysis_details["x_axis"]
-        
+
         # Run the query
         data_df = run_query(conn, query)
 
         # --- Display the chart and data ---
         if not data_df.empty:
             st.markdown(f"<h3 class='section-title'>{selected_analysis_name}</h3>", unsafe_allow_html=True)
-            
+
             # Display the bar chart
-            # We set the x-axis to our category (e.g., 'company_name')
-            # and the y-axis to 'quantity'
-            st.bar_chart(data_df, x=x_col, y="quantity")
-            
+            st.bar_chart(data_df.set_index(x_col)['quantity']) # Use set_index for better labels
+
             # Also display the raw data in a table
             st.dataframe(data_df, use_container_width=True)
         else:
