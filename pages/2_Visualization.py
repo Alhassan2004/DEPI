@@ -34,7 +34,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Header ---
-st.markdown("<h1>📊 Data Visualizations</h1>", unsafe_allow_html=True)
+st.markdown("<h1>Data Visualizations</h1>", unsafe_allow_html=True)
 # --- The line below has been removed ---
 # st.markdown("<p style='text-align:center;'>Select a category to visualize the count of job postings.</p>", unsafe_allow_html=True)
 
