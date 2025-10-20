@@ -29,7 +29,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h1>📊 Data Visualizations</h1>", unsafe_allow_html=True)
+st.markdown("<h1>Data Visualizations</h1>", unsafe_allow_html=True)
 
 @st.cache_resource
 def get_connection():
