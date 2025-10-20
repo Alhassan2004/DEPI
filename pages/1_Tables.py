@@ -144,7 +144,8 @@ if conn:
         )
 
         if selected_table:
-            st.markdown(f"<h3 class='section-title'>🗂 Displaying Data for: {TABLE_DISPLAY_NAMES.get(selected_table, selected_table.replace('_', ' ').title())}</h3>", unsafe_allow_html=True)
+            # --- THIS LINE IS CHANGED ---
+            st.markdown(f"<h3 class='section-title'>Displaying Data for: {TABLE_DISPLAY_NAMES.get(selected_table, selected_table.replace('_', ' ').title())}</h3>", unsafe_allow_html=True)
 
             # Get all column names
             all_columns = conn.execute(f"PRAGMA table_info('{selected_table}')").fetchdf()
