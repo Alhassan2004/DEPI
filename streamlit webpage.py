@@ -64,4 +64,5 @@ if selected_table:
     
     data_df = conn.execute(query).fetchdf()
 
-    st.dataframe(data_df, use_container_width=Tru
+    st.dataframe(data_df, use_container_width=True)
+
