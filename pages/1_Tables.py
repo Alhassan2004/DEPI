@@ -13,16 +13,18 @@ st.set_page_config(
 # --- Custom Styling ---
 st.markdown("""
     <style>
+    
     /* 1. Overall Page Style */
+    /* Force the main app background to be off-white */
     .stApp {
-        background-color: #F9F9F9; /* Off-white background */
-        color: #000000;         /* Default black text */
+        background-color: #F9F9F9 !important; 
+        color: #000000 !important;         
     }
 
     /* 2. Titles (Kept from your original request) */
     h1, h2, h3 {
         text-align: center;
-        color: #1E3A8A; /* Blue title color */
+        color: #1E3A8A; 
         font-family: 'Arial', sans-serif;
     }
     .section-title {
@@ -80,20 +82,38 @@ st.markdown("""
         color: #000000 !important;
     }
 
-    /* 6. DATAFRAME (Table) STYLING */
-    .stDataFrame {
-        background-color: #F9F9F9; /* Off-white container */
-        border: 1px solid #D1D5DB;
-        border-radius: 8px;
+    /* * 6. DATAFRAME (Table) STYLING - *** THIS IS THE NEW FIX ***
+     */
+    
+    /* Main container of the dataframe */
+    [data-testid="stDataFrame"] {
+        background-color: #F9F9F9 !important; /* Off-white container */
+        border: 1px solid #D1D5DB !important;
+        border-radius: 8px !important;
     }
-    /* Ensure dataframe text is black */
-    .stDataFrame div {
+    
+    /* Header row */
+    [data-testid="stHeader"] {
+        background-color: #EDEDED !important; /* Light grey header */
+        color: #000000 !important;
+    }
+    
+    /* Ensure all text inside the dataframe (header + cells) is black */
+    [data-testid="stDataFrame"] div,
+    [data-testid="stHeader"] div {
          color: #000000 !important;
     }
-    /* Dataframe header */
-    [data-testid="stHeader"] {
-        background-color: #EDEDED; /* Light grey header */
-        color: #000000;
+    
+    /* Set background for the data cells area */
+    [data-testid="stTable"] {
+        background-color: #F9F9F9 !important; /* Off-white rows */
+        color: #000000 !important;
+    }
+
+    /* Force individual cells (just in case) */
+    [data-testid="stTable"] [data-testid="stElement"] {
+        background-color: #F9F9F9 !important;
+        color: #000000 !important;
     }
     
     </style>
@@ -109,7 +129,7 @@ def get_connection():
     # Use a relative path to find the database
     # Assumes db is in the parent folder (e.g., main repo folder)
     # and this script is in a subfolder (e.g., /pages)
-    # If a.py and db are in the SAME folder, just use "job_postings.duckdb"
+    # If app.py and db are in the SAME folder, just use "job_postings.duckdb"
     db_path = "job_postings.duckdb" 
     
     # This logic tries to find it in the parent folder, good for Streamlit Cloud
