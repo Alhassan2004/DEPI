@@ -39,9 +39,10 @@ st.markdown("""
     <hr style="margin-top:40px; margin-bottom:10px;">
     <div style="text-align:center; color:#2C3E50; font-size:18px;">
         <b>DEPI Round 3 Graduation Project</b><br>
-        (Alhassan Soliman, Mohammed Morsi, Yassin Harraz, Maha Khaled, Youstina Nader, Menna El Naiad)
+        (Mohammed Morsi - Alhassan Soliman - Yassin Harraz - Maha Khaled - Youstina Nader - Menna El Naiad)
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
