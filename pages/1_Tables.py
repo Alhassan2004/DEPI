@@ -36,7 +36,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Header ---
-st.markdown("<h1>📋 Job Postings Database Explorer</h1>", unsafe_allow_html=True)
+st.markdown("<h1>Job Postings Database Explorer</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center;'>Select a table from the database to view its contents.</p>", unsafe_allow_html=True)
 
 # --- Database Connection ---
@@ -56,7 +56,7 @@ def get_connection():
     elif os.path.exists(alt_db_path):
         db_to_use = alt_db_path
     else:
-        st.error(f"❌ Database file not found. Tried: '{db_path}' and '{alt_db_path}'")
+        st.error(f"Database file not found. Tried: '{db_path}' and '{alt_db_path}'")
         return None
         
     try:
@@ -103,7 +103,7 @@ if conn:
     # --- End Configuration ---
 
     if options_to_show:
-        st.markdown("<h3 class='section-title'>📂 Select a Table</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 class='section-title'>Select a Table</h3>", unsafe_allow_html=True)
 
         # Create the dropdown menu
         selected_table = st.selectbox(
@@ -138,7 +138,7 @@ if conn:
                 st.error(f"Error loading table '{selected_table}': {e}")
 
     else:
-        st.warning("⚠️ No tables found to display. Please verify your 'job_postings.duckdb' file.")
+        st.warning("No tables found to display. Please verify your 'job_postings.duckdb' file.")
 else:
     # This message shows if get_connection() failed
     st.error("Database connection could not be established.")
