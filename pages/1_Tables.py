@@ -129,22 +129,30 @@ if conn:
         "dim_date": "Date Information"
     }
 
-    # ✅ Show all tables, not just filtered ones
-    options_to_show = table_names
+    # --- THIS IS THE MODIFIED SECTION ---
+    # Define the actual table names you want to hide
+    tables_to_hide = [
+        "fact_job_posting_skill", 
+        "raw_job_postings", 
+        "stg_job_postings"
+    ]
+
+    # Filter the list of tables to create the options
+    options_to_show = [name for name in table_names if name not in tables_to_hide]
+    # --- END OF MODIFIED SECTION ---
 
     if options_to_show:
         st.markdown("<h3 class='section-title'>📂 Select a Table</h3>", unsafe_allow_html=True)
 
         selected_table = st.selectbox(
             "",
-            options=options_to_show,
+            options=options_to_show, # This now uses the filtered list
             # Show pretty names for known tables, readable names for others
             format_func=lambda name: TABLE_DISPLAY_NAMES.get(name, name.replace("_", " ").title()),
             label_visibility="collapsed"
         )
 
         if selected_table:
-            # --- THIS LINE IS CHANGED ---
             st.markdown(f"<h3 class='section-title'>Displaying Data for: {TABLE_DISPLAY_NAMES.get(selected_table, selected_table.replace('_', ' ').title())}</h3>", unsafe_allow_html=True)
 
             # Get all column names
