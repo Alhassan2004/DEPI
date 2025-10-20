@@ -24,13 +24,13 @@ st.markdown("""
 # --- Page Content ---
 st.markdown("<h1>💼 Intelligent Career Advisor Dashboard</h1>", unsafe_allow_html=True)
 st.markdown("""
-Welcome to the **Job Postings Explorer** platform.  
-Here you can:
-- 📋 Explore job postings data (Tables page)
-- 📊 Visualize job trends and insights (coming next)
-- 🧠 Analyze skill requirements and career trends (future pages)
-
-Use the sidebar to navigate between pages.
-""")
+    <div style="font-size:22px; line-height:1.8; text-align:center; color:#2C3E50;">
+        <b>Here you can:</b><br>
+        📋 Explore job postings data (Tables page)<br>
+        📊 Visualize job trends and insights (coming next)<br>
+        🧠 Analyze skill requirements and career trends (future pages)<br><br>
+        <i>Use the sidebar to navigate between pages.</i>
+    </div>
+""", unsafe_allow_html=True)
 
 
