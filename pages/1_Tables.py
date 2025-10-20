@@ -115,6 +115,3 @@ if conn:
 
     if options_to_show:
         st.markdown("<h3 class='section-title'>📂 Select a Table</h3>", unsafe_allow_html=True)
-        se
-
-
